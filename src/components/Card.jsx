@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
-import { useSelector, useDispatch } from 'react-redux';
-import { increment, decrement } from '../store/index';
-import { fetchPosts } from '../store/indexing';
+import { useSelector, useDispatch } from "react-redux";
+import { increment, decrement } from "../store/index";
+import { fetchPosts } from "../store/indexing";
 
 function Card() {
   const [onHover, setOnHover] = useState(false);
@@ -16,15 +16,14 @@ function Card() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (status === 'idle') {
+    if (status === "idle") {
       dispatch(fetchPosts());
     }
   }, [status, dispatch]);
 
   return (
     <>
-    
-      <CardContainer
+      {/* <CardContainer
         onMouseEnter={() => setOnHover(true)}
         onMouseLeave={() => setOnHover(false)}
       >
@@ -46,7 +45,7 @@ function Card() {
             className='hover-image'
           />
         )}
-      </CardContainer>
+      </CardContainer> */}
     </>
   );
 }

@@ -1,78 +1,108 @@
-import { useState, useEffect } from 'react';
-import { firebaseauth } from '../utils/firebase';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState, useEffect } from "react";
+import { firebaseauth } from "../utils/firebase";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
-import styled from 'styled-components';
-import Topnav from '../components/Topnav';
-import Card from '../components/Card';
-import { getGenres, fetchMovies } from '../store';
-import { fetchPosts } from '../store/indexing';
+import styled from "styled-components";
+import Topnav from "../components/Topnav";
+import Card from "../components/Card";
+import Mylist from "./Mylist";
+import {
+  fetchPosts,
+  increment,
+  decrement,
+  addToFavorites,
+  removeFromFavorites,
+} from "../store/indexing";
+
+import "../App.css";
 
 const Netflix = () => {
   const [isScrolling, setIsScrolling] = useState(false);
+  const [favorites, setFavorites] = useState([]);
 
-  const GenresLoaded = useSelector((store) => store.netflix.genresLoaded);
   const posts = useSelector((store) => store.posts.posts);
-  const status = useSelector((store) => store.posts.status);
-  const error = useSelector((store) => store.posts.error);
+  const counter = useSelector((store) => store.posts.value);
+  const favoritesentence = useSelector((store) => store.posts.favorites);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const favoritepost = useSelector((store) => store.posts.favorites);
   useEffect(() => {
     dispatch(fetchPosts());
   }, [dispatch]);
-
-  // useEffect(() => {
-  //   dispatch(getGenres());
-  // },);
-
-  // useEffect(() => {
-  //   if (GenresLoaded) {
-  //     dispatch(fetchMovies({type: 'all'}));
-  //   }
-  //   console.log('GenresLoaded');
-  // });
 
   window.onscroll = () => {
     setIsScrolling(window.scrollY === 0 ? false : true);
     return () => (window.onscroll = null);
   };
-  console.log(isScrolling);
+
+  const removeFavorite = (postToRemove) => {
+    setFavorites(favorites.filter((post) => post.id !== postToRemove.id));
+  };
+
+  const addFavorite = (postToAdd) => {
+    if (favorites.find((post) => post.id === postToAdd.id)) {
+      return;
+    } else {
+      const newFavorites = [...favorites, postToAdd];
+      setFavorites(newFavorites);
+    }
+  };
+
+  console.log(favorites);
 
   return (
-    <>
+    <div>
       <HeroContainer>
-        <div className='hero'>
+        <div className="hero">
           <Topnav isScrolling={isScrolling} />
           <img
-            className='background-image'
-            src='https://i.pinimg.com/originals/39/60/78/396078652ee90370db06582a1ef01bd8.jpg'
-            alt='background image'
+            className="background-image"
+            src="https://i.pinimg.com/originals/39/60/78/396078652ee90370db06582a1ef01bd8.jpg"
+            alt="background image"
           />
           <div>
             <h1>Posts</h1>
-            <button
-                onClick={() => navigate('/player')}
-                className='playbutton'
-              >
-                Play
-              </button>
+            <button onClick={() => navigate("/player")} className="playbutton">
+              Play
+            </button>
             <ul>
               {posts.map((post) => (
-                <li key={post.id}>{post.title}</li>
+                <li key={post.id}>
+                  {post.title}
+                  <br />
+                  <button
+                    // execute the removeFavorite function
+                    onClick={() => {
+                      dispatch(removeFromFavorites(post.title));
+                    }}
+                    className="removebutton"
+                  >
+                    Remove favorite
+                  </button>
+                  <button
+                    onClick={() => {
+                      dispatch(addToFavorites(post.title));
+                    }}
+                    className="addbutton"
+                  >
+                    Add favorite
+                  </button>
+                </li>
+              ))}
+
+              {favorites.map((post) => (
+                <Mylist favoritesentences={favoritesentence} />
               ))}
             </ul>
           </div>
-          <div className='container'>
-            <div className='buttons'>
-              
-            </div>
-          </div>
+          <h2>Favorites sentences:</h2>
+          <span>{favoritesentence}</span>
         </div>
         <Card />
       </HeroContainer>
-    </>
+    </div>
   );
 };
 
@@ -97,7 +127,7 @@ const HeroContainer = styled.div`
           color: white;
           font-size: 1rem;
           width: 40rem;
-          font-family: 'Roboto', sans-serif;
+          font-family: "Roboto", sans-serif;
           color: #f7aa04;
         }
       }
@@ -115,6 +145,26 @@ const HeroContainer = styled.div`
       font-weight: bold;
       cursor: pointer;
       margin-right: 1rem;
+    }
+    addbutton {
+      background-color: green;
+      color: white;
+      border: none;
+      outline: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      margin-right: 1rem;
+      cursor: pointer;
+    }
+    removebutton {
+      background-color: red;
+      color: white;
+      border: none;
+      outline: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      margin-right: 1rem;
+      cursor: pointer;
     }
     .morebutton {
       padding: 1rem 2rem;
